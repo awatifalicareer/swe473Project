@@ -7,9 +7,8 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
 
 @Data
 @Component
@@ -19,7 +18,7 @@ public class TravelStrategy {
     @NonNull
     private RuleCollection ruleCollection;
 
-    public Consumer<Double> anyWhereInZoneOneStrategy = chargeableAmount -> {
+    private final DoubleConsumer anyWhereInZoneOneStrategy = chargeableAmount -> {
         Rule rule = new Rule();
         rule.setChargeableFare(chargeableAmount);
 
@@ -31,7 +30,7 @@ public class TravelStrategy {
 
     };
 
-    public Consumer<Double> anyOneZoneOutsideZoneOneStrategy = chargeableAmount -> {
+    private final DoubleConsumer anyOneZoneOutsideZoneOneStrategy = chargeableAmount -> {
         Rule rule = new Rule();
         rule.setChargeableFare(chargeableAmount);
 
@@ -42,7 +41,7 @@ public class TravelStrategy {
         ruleCollection.addRules(rule);
     };
 
-    public Consumer<Double> anyTwoZoneIncludingZoneOneStrategy = chargeableAmount -> {
+    private final DoubleConsumer anyTwoZoneIncludingZoneOneStrategy = chargeableAmount -> {
         Rule rule = new Rule();
         rule.setChargeableFare(chargeableAmount);
 
@@ -55,7 +54,7 @@ public class TravelStrategy {
         ruleCollection.addRules(rule);
     };
 
-    public  Consumer<Double> anyTwoZoneExcludingZoneOneStrategy = chargeableAmount -> {
+    private final DoubleConsumer anyTwoZoneExcludingZoneOneStrategy = chargeableAmount -> {
         Rule rule = new Rule();
         rule.setChargeableFare(chargeableAmount);
 
@@ -66,7 +65,7 @@ public class TravelStrategy {
         ruleCollection.addRules(rule);
     };
 
-    public Consumer<Double> anyThreeZoneStrategy = chargeableAmount -> {
+    private final DoubleConsumer anyThreeZoneStrategy = chargeableAmount -> {
         Rule rule = new Rule();
         rule.setChargeableFare(chargeableAmount);
 
@@ -75,7 +74,7 @@ public class TravelStrategy {
         ruleCollection.addRules(rule);
     };
 
-    public BiConsumer<Double, TransportType> anyJourneyByBus = (chargeableAmount, transType) -> {
+    private final BiConsumer<Double, TransportType> anyJourneyByBus = (chargeableAmount, transType) -> {
         Rule rule = new Rule();
         rule.setChargeableFare(chargeableAmount);
         rule.setTransportType(transType);

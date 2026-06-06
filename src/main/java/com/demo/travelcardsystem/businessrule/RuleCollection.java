@@ -18,3 +18,4 @@ public class RuleCollection {
         rules.add(rule);
     }
 }
+ 

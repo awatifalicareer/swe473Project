@@ -29,7 +29,7 @@ public  class TravelCard implements Observable {
 
     @Override
     public void notifyAllObservers() {
-        observerCollection.forEach(observer -> {
+        observerCollection.forEach(observer -> 
             observer.reactOnChange(this);
         });
     }

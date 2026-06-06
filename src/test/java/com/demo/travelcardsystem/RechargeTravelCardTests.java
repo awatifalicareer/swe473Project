@@ -20,99 +20,111 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+class RechargeTravelCardTests extends IntegrationTest {
 
-class RechargeTravelCardTests extends IntegrationTest{
+    private static final String APPLICATION_JSON = "application/json";
+    private static final String REGISTER_ENDPOINT = "/api/card/register";
+    private static final String PING_ENDPOINT = "/api/card/ping";
+    private static final String RECHARGE_ENDPOINT = "/api/card/recharge/{rechargeAmount}";
+    private static final String INVALID_CARD_MESSAGE =
+            "This card is Invalid. Please use a valid card";
 
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private ObjectMapper objectMapper;
+
     @Autowired
     private InMemoryCardTransactionRepository inMemoryCardTransactionRepository;
+
     @Autowired
     private TravelHelperTest travelHelperTest;
 
     private static Stream<Arguments> usersGenerator() {
         return Stream.of(
-                Arguments.of("1AE101",  30),
-                Arguments.of("1AE102",  40)
+                Arguments.of("1AE101", 30),
+                Arguments.of("1AE102", 40)
         );
     }
 
     @BeforeEach
     public void resetRepository() {
         inMemoryCardTransactionRepository.clearTravelCardStore();
-
     }
-
 
     @DisplayName("Service is Up and Running")
     @Test
     public void check_if_ping_is_working() throws Exception {
-        mockMvc.perform(get("/api/card/ping"))
+        mockMvc.perform(get(PING_ENDPOINT))
                 .andExpect(status().isOk());
-
     }
 
     @DisplayName("User try to register himself successfully")
     @ParameterizedTest
     @MethodSource("usersGenerator")
     public void register_user_in_the_system(String cardNumber, double amount) throws Exception {
-        //GIVEN - user enter his user detail
+
+        // GIVEN - user enters card details
         TravelCard travelCard = new TravelCard();
         travelCard.setCardNumber(cardNumber);
         travelCard.setBalance(amount);
 
-
-        //WHEN -  User try to register himself
-        mockMvc.perform(post("/api/card/register")
-                        .contentType("application/json")
+        // WHEN - user registers the card
+        mockMvc.perform(post(REGISTER_ENDPOINT)
+                        .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(travelCard)))
                 .andExpect(status().isOk());
 
-        //THEN - Check if RegisteredUsersMap is populated or not
-        assertThat(inMemoryCardTransactionRepository.findCardByCardNumber(cardNumber)).isEqualTo(travelCard);
-
+        // THEN - card should be stored in the repository
+        assertThat(
+                inMemoryCardTransactionRepository.findCardByCardNumber(cardNumber)
+        ).isEqualTo(travelCard);
     }
 
     @DisplayName("User try to recharge a invalid card. System throws INVALID_CARD exception")
     @Test
     public void register_user_with_invalid_card_number() throws Exception {
 
-        //INVALID CARD NUMBER IS SET HERE
+        // GIVEN - invalid card number
         TravelCard travelCard = new TravelCard();
         travelCard.setCardNumber(null);
         travelCard.setBalance(30);
 
-        //WHEN -  User try to register himself
-       String errorMsg =  mockMvc.perform(post("/api/card/register")
-                        .contentType("application/json")
+        // WHEN - user attempts registration
+        String errorMsg = mockMvc.perform(post(REGISTER_ENDPOINT)
+                        .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(travelCard)))
-                //THEN -  status should be not acceptable
                 .andExpect(status().isNotAcceptable())
-                .andReturn().getResolvedException().getMessage();
+                .andReturn()
+                .getResolvedException()
+                .getMessage();
 
-
-        //THEN -  exception should be thrown
-        assertEquals(errorMsg, "This card is Invalid. Please use a valid card");
+        // THEN - appropriate exception message should be returned
+        assertEquals(INVALID_CARD_MESSAGE, errorMsg);
     }
 
     @DisplayName("Users are able to recharge the card successfully")
     @ParameterizedTest
     @MethodSource("usersGenerator")
-    public void users_are_able_to_recharge_the_card_successfully(String cardNumber, double amount) throws Exception {
-        // GIVEN - user exists in the system with a valid card number and zero amount on card. Records are directly inserted in the repository.
+    public void users_are_able_to_recharge_the_card_successfully(
+            String cardNumber,double amount) throws Exception {
+
+        // GIVEN - user exists in the system
         travelHelperTest.directUserRegistration(cardNumber, 0);
 
-        //WHEN - user try to recharge the card
-        mockMvc.perform(post("/api/card/recharge/{rechargeAmount}", amount)
-                        .contentType("application/json")
+        // WHEN - user recharges the card
+        mockMvc.perform(post(RECHARGE_ENDPOINT, amount)
+                        .contentType(APPLICATION_JSON)
                         .content(cardNumber))
                 .andExpect(status().isOk());
 
-
-        //THEN - card should be recharged with provided amount.
-        assertEquals(inMemoryCardTransactionRepository.findCardByCardNumber(cardNumber).getBalance(), amount);
+        // THEN - balance should be updated
+        assertEquals(
+                amount,
+                inMemoryCardTransactionRepository
+                        .findCardByCardNumber(cardNumber)
+                        .getBalance()
+        );
     }
-
 }

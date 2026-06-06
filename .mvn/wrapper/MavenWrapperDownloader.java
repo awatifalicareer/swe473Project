@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+package .mvn.wrapper;
 import java.net.*;
 import java.io.*;
 import java.nio.channels.*;

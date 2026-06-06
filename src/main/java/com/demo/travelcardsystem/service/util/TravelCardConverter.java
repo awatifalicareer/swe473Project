@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 @Component
 public class TravelCardConverter {
-    public Function<TravelCard, TravelCardResponse> travelCard2TravelCardResponseConverter = travelCard -> {
+    protected Function<TravelCard, TravelCardResponse> travelCard2TravelCardResponseConverter = travelCard -> {
         TravelCardResponse travelCardResponse = new TravelCardResponse();
         travelCardResponse.setCardNumber(travelCard.getCardNumber());
         travelCardResponse.setBalance(travelCard.getBalance());
