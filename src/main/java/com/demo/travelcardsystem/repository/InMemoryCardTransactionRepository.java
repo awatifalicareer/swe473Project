@@ -61,4 +61,8 @@ public class InMemoryCardTransactionRepository {
     public List<String> fetchAllCardNumber() {
         return new ArrayList<>(travelCardStore.keySet());
     }
+
+    public Set<Station> findAllStations() {
+    return stationStore;
+    }
 }

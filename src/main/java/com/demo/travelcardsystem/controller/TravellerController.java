@@ -1,5 +1,8 @@
 package com.demo.travelcardsystem.controller;
 
+import com.demo.travelcardsystem.model.response.StationZoneResponse;
+import java.util.Set;
+
 import com.demo.travelcardsystem.model.request.CardRegistrationRequest;
 import com.demo.travelcardsystem.model.request.SwipeRequest;
 import com.demo.travelcardsystem.model.response.TravelCardResponse;
@@ -47,5 +50,9 @@ public class TravellerController {
         return travellerService.fetchAllCard();
     }
 
+    @GetMapping("/stations-zones")
+    public Set<StationZoneResponse> getAllStationsAndZones() {
+        return travellerService.getAllStationsAndZones();
+    }
 
 }

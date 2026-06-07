@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -18,7 +19,9 @@ public class TravelStrategy {
 
     @NonNull
     private RuleCollection ruleCollection;
-
+    @Value("${fare.maximum}")
+    private double maximumFare;
+    
     public Consumer<Double> anyWhereInZoneOneStrategy = chargeableAmount -> {
         Rule rule = new Rule();
         rule.setChargeableFare(chargeableAmount);
@@ -90,10 +93,10 @@ public class TravelStrategy {
         anyOneZoneOutsideZoneOneStrategy.accept(2.00);
         anyTwoZoneIncludingZoneOneStrategy.accept(3.00);
         anyTwoZoneExcludingZoneOneStrategy.accept(2.25);
-        anyThreeZoneStrategy.accept(3.20);
+        anyThreeZoneStrategy.accept(maximumFare);
         anyJourneyByBus.accept(1.80, TransportType.BUS);
 
-        this.ruleCollection.setMaxFare(3.20);
+        this.ruleCollection.setMaxFare(maximumFare);        
 
         return this.ruleCollection;
     }
