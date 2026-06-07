@@ -1,5 +1,6 @@
 package com.demo.travelcardsystem.service;
 
+import com.demo.travelcardsystem.model.response.StationZoneResponse;
 import com.demo.travelcardsystem.entity.Journey;
 import com.demo.travelcardsystem.entity.Station;
 import com.demo.travelcardsystem.entity.TravelCard;
@@ -15,6 +16,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -106,5 +109,15 @@ public class TravellerService {
 
     public List<String> fetchAllCard() {
        return inMemoryCardTransactionRepository.fetchAllCardNumber();
+    }
+
+    public Set<StationZoneResponse> getAllStationsAndZones() {
+    return inMemoryCardTransactionRepository.findAllStations()
+            .stream()
+            .map(station -> StationZoneResponse.builder()
+                    .stationName(station.getName())
+                    .zones(station.getZones())
+                    .build())
+            .collect(Collectors.toSet());
     }
 }
